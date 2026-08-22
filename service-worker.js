@@ -1,7 +1,7 @@
 // 911 Nails — Service Worker
 // V38: catálogo distribuido como single-file (imágenes embebidas en index.html).
 // Cambia CACHE_VERSION en cada despliegue nuevo para forzar actualización.
-const CACHE_VERSION = '911nails-v38-1';
+const CACHE_VERSION = '911nails-v38-3';
 const PRECACHE_URLS = [
   './',
   './index.html',
