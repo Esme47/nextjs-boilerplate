@@ -1,0 +1,32 @@
+{
+  "name": "911 Nails — Catálogo Profesional 2026",
+  "short_name": "911 Nails",
+  "description": "Catálogo profesional 911 Nails: productos, equipos, bioseguridad y formación especializada para nail artists.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F9F1F6",
+  "theme_color": "#8D3B68",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "911-nails-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "911-nails-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "911-nails-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
