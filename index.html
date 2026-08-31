@@ -2770,12 +2770,29 @@ window.shareCatalog911 = function(){
 
 <script id="v39-update-notice">
 (function(){
-  // Cambia este valor cada vez que actualices el catálogo para que el aviso aparezca de nuevo.
-  var CATALOG_VERSION = "2026-08-31-3";
+  // Cambia este valor cada vez que actualices el catálogo para que el aviso vuelva a aparecer
+  // (adentro de la app) y el icono muestre el punto/número de notificación (fuera de la app).
+  var CATALOG_VERSION = "2026-08-31-4";
+
+  function setIconBadge(count){
+    // Badging API: pone el aviso sobre el icono de la app (como TikTok o WhatsApp).
+    // Solo funciona si el catálogo se abre por https/vercel y se instaló como app
+    // ("Añadir 911 Nails" a la pantalla de inicio). En navegador o archivo local no aparece.
+    try{
+      if(count > 0 && 'setAppBadge' in navigator){
+        navigator.setAppBadge(count).catch(function(){});
+      } else if('clearAppBadge' in navigator){
+        navigator.clearAppBadge().catch(function(){});
+      }
+    }catch(e){}
+  }
+
   try{
     var seen = localStorage.getItem('v911CatalogVersion');
     if(seen !== CATALOG_VERSION){
+      // Hay una actualización nueva que esta persona todavía no ha visto.
       localStorage.setItem('v911CatalogVersion', CATALOG_VERSION);
+      setIconBadge(1);
       var t = document.getElementById('update-toast');
       if(t){
         setTimeout(function(){
@@ -2783,6 +2800,9 @@ window.shareCatalog911 = function(){
           setTimeout(function(){ t.classList.remove('show'); }, 5000);
         }, 700);
       }
+    } else {
+      // Ya vio la última actualización: si quedaba un aviso en el icono, se limpia.
+      setIconBadge(0);
     }
   }catch(e){}
 })();
