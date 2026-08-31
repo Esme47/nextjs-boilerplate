@@ -97,13 +97,15 @@ Esta edición no depende de la carpeta assets.
   }
   .search::placeholder{color:var(--muted);}
 
-  .chip-scroll{display:flex; gap:7px; overflow-x:auto; padding:12px 14px 4px; scrollbar-width:none;}
+  .chip-scroll{display:flex; gap:10px; overflow-x:auto; padding:14px 14px 8px; scrollbar-width:none;}
   .chip-scroll::-webkit-scrollbar{display:none;}
   .cat-chip{
-    flex-shrink:0; padding:7px 13px; border-radius:20px; font-size:11.5px; white-space:nowrap; cursor:pointer;
-    border:1px solid var(--line); background:var(--panel); color:var(--muted);
+    flex-shrink:0; padding:12px 20px; border-radius:999px; font-size:13.5px; font-weight:800; white-space:nowrap; cursor:pointer;
+    border:1.5px solid var(--line); background:var(--panel); color:var(--muted); box-shadow:0 6px 16px rgba(0,0,0,.18);
+    transition:transform .15s ease, box-shadow .15s ease;
   }
-  .cat-chip.active{border-color:var(--gold); background:var(--wine); color:var(--cream);}
+  .cat-chip:active{transform:scale(.95);}
+  .cat-chip.active{border-color:var(--gold); background:linear-gradient(135deg,var(--wine-light),var(--wine)); color:var(--cream); box-shadow:0 10px 24px rgba(0,0,0,.3);}
 
   .count-row{padding:10px 18px 2px; font-size:10.5px; letter-spacing:1px; text-transform:uppercase; color:var(--muted);}
   .grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:10px 14px 20px;}
@@ -264,8 +266,8 @@ Esta edición no depende de la carpeta assets.
   .search{background:rgba(255,255,255,.92);border-color:#E5D8E1;color:#332C33;box-shadow:0 6px 20px rgba(75,45,65,.06);}
   .search::placeholder{color:#A096A0;}
   .chip-scroll{padding-top:12px;}
-  .cat-chip{background:#FFF;border-color:#E6DCE4;color:#756A75;box-shadow:0 3px 10px rgba(75,45,65,.035);}
-  .cat-chip.active{background:linear-gradient(135deg,#8D3B68,#B84E84);border-color:#C9A24B;color:#FFF;}
+  .cat-chip{background:#FFF;border-color:#E6DCE4;color:#5B4E59;font-weight:800;box-shadow:0 8px 18px rgba(75,45,65,.14);}
+  .cat-chip.active{background:linear-gradient(135deg,#8D3B68,#C85C92);border-color:#D4AF37;color:#FFF;box-shadow:0 12px 26px rgba(141,59,104,.35);}
   .count-row{color:#8D7C87;font-weight:700;}
   .grid{gap:13px;padding-top:10px;}
   .card{background:rgba(255,255,255,.95);border-color:#E8DDE5;border-radius:20px;box-shadow:0 10px 24px rgba(71,48,63,.08);transition:transform .2s ease,box-shadow .2s ease;}
@@ -296,7 +298,12 @@ Esta edición no depende de la carpeta assets.
   .course-tagline,.cursos-desc{color:#7D727D;}
   .whatsapp-btn{background:linear-gradient(135deg,#8D3B68,#C85C92);}
   .locked-box{background:#FAF2F7;border-color:#C9A24B;}
-  @media (max-width:380px){.hero-title{font-size:22px}.floating-wa{right:76px;bottom:16px}.grid{gap:10px;padding-left:10px;padding-right:10px}}
+  @media (max-width:380px){.hero-title{font-size:22px}.floating-wa{right:76px;bottom:16px}
+  .update-toast{position:fixed;top:12px;left:50%;transform:translateX(-50%) translateY(-160%);z-index:99999;display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#8D3B68,#C85C92);color:#FFF;padding:12px 16px;border-radius:16px;box-shadow:0 16px 36px rgba(91,42,69,.38);border:1px solid rgba(255,255,255,.4);font-size:12.5px;font-weight:800;max-width:90vw;transition:transform .5s cubic-bezier(.34,1.56,.64,1);cursor:pointer;}
+  .update-toast.show{transform:translateX(-50%) translateY(0);}
+  .update-toast-icon{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;background:rgba(255,255,255,.22);}
+  .update-toast-text small{display:block;font-weight:600;opacity:.9;font-size:10.5px;margin-top:2px;}
+.grid{gap:10px;padding-left:10px;padding-right:10px}}
 
   /* ===== Nivel 2026 · Favoritos, Nav inferior, Badges, Skeleton, Animaciones ===== */
   body{padding-bottom:78px;}
@@ -1016,6 +1023,7 @@ img{image-rendering:auto!important;}
 </head>
 <body>
 <button id="v38-install" hidden type="button" onclick="install911Nails()" aria-label="Instalar 911 Nails en el dispositivo">＋ Añadir 911 Nails</button><div style="position:fixed;top:10px;right:10px;z-index:9998;padding:6px 10px;border-radius:999px;background:#8D3B68;color:#fff;font:700 11px/1.1 Arial,sans-serif;opacity:.9">V37 · 2026</div>
+<div class="update-toast" id="update-toast" onclick="this.classList.remove('show')" role="status" aria-live="polite"><div class="update-toast-icon">🔔</div><div class="update-toast-text">¡Catálogo actualizado!<small>Nuevos productos y precios disponibles</small></div></div>
 <div class="app">
   <div class="topbar">
     <div class="topbar-inner">
@@ -2758,6 +2766,26 @@ window.shareCatalog911 = function(){
   if(navigator.share){navigator.share(data).catch(function(){});}
   else if(navigator.clipboard){navigator.clipboard.writeText(location.href).catch(function(){});}
 };
+</script>
+
+<script id="v39-update-notice">
+(function(){
+  // Cambia este valor cada vez que actualices el catálogo para que el aviso aparezca de nuevo.
+  var CATALOG_VERSION = "2026-08-31-3";
+  try{
+    var seen = localStorage.getItem('v911CatalogVersion');
+    if(seen !== CATALOG_VERSION){
+      localStorage.setItem('v911CatalogVersion', CATALOG_VERSION);
+      var t = document.getElementById('update-toast');
+      if(t){
+        setTimeout(function(){
+          t.classList.add('show');
+          setTimeout(function(){ t.classList.remove('show'); }, 5000);
+        }, 700);
+      }
+    }
+  }catch(e){}
+})();
 </script>
 </body>
 </html>
