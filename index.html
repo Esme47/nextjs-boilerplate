@@ -26,7 +26,7 @@ Esta edición no depende de la carpeta assets.
 
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-<meta name="revision" content="V38 · V37 base · distribución web móvil + PWA + performance + conversion">
+<meta name="revision" content="V39 · V38 base · experiencia de compra inteligente + PWA + conversion">
 <meta name="application-name" content="911 Nails">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -2793,6 +2793,42 @@ window.shareCatalog911 = function(){
 };
 </script>
 
+
+<!-- V39 · EXPERIENCIA DE COMPRA INTELIGENTE -->
+<style id="v39-commerce-style">
+#v39-smartbar{margin:10px 14px 14px;padding:12px;border:1px solid #eadfe5;border-radius:18px;background:linear-gradient(135deg,#fff,#fff6fa);box-shadow:0 8px 24px rgba(77,35,58,.06)}
+#v39-smartbar .v39-title{font-size:.72rem;font-weight:900;letter-spacing:.11em;color:#8d3b68;margin-bottom:9px;text-transform:uppercase}
+#v39-filters{display:flex;gap:8px;overflow:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+#v39-filters::-webkit-scrollbar{display:none}.v39-pill{border:1px solid #ead8e2;background:#fff;border-radius:999px;padding:8px 12px;white-space:nowrap;font-size:.78rem;font-weight:800;color:#5b4654;cursor:pointer}.v39-pill.active{background:#8d3b68;color:#fff;border-color:#8d3b68}
+#v39-recent{margin:8px 14px 18px;display:none}.v39-head{display:flex;align-items:center;justify-content:space-between;margin:0 0 9px}.v39-head strong{font-size:.95rem}.v39-clear{border:0;background:none;color:#8d3b68;font-weight:800;font-size:.75rem}.v39-row{display:flex;gap:10px;overflow:auto;padding:2px 0 5px}.v39-item{min-width:118px;max-width:118px;background:#fff;border:1px solid #eee3e9;border-radius:14px;overflow:hidden;box-shadow:0 5px 15px rgba(0,0,0,.05);cursor:pointer}.v39-item img{width:100%;height:82px;object-fit:cover;background:#f6f2f4}.v39-item div{padding:7px;font-size:.68rem;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v39-badge{display:inline-flex;align-items:center;gap:4px;font-size:.62rem;font-weight:900;padding:4px 7px;border-radius:999px;background:#fff1f7;color:#8d3b68;margin-top:6px}
+</style>
+<script id="v39-commerce-intelligence">
+(function(){'use strict';
+var KEY='911-v39-recent';
+var synonymMap={
+ 'lampara':['uv','led','sun','pixar','lámpara'],
+ 'lima':['limas','spongee','buffer'],
+ 'cortauñas':['corta cuticula','corta cutícula','cortacuticula'],
+ 'brillo':['top coat','topcoat'],
+ 'empezar':['combo inicio','principiante','basico','básico'],
+ 'principiante':['combo inicio','inicio profesional'],
+ 'drill':['e-file','efile','brocas','puntas'],
+ 'acrilico':['acrylic','monomero','monómero','polvo acrílico'],
+ 'gel':['builder','acrygel','rubber','semipermanente']
+};
+function norm(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
+function recent(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
+function saveRecent(a){try{localStorage.setItem(KEY,JSON.stringify(a.slice(0,8)))}catch(e){}}
+function renderRecent(){var box=document.getElementById('v39-recent');if(!box||!window.DATA)return;var ids=recent().filter(function(i){return DATA.products[i]});if(!ids.length){box.style.display='none';return}box.style.display='block';box.querySelector('.v39-row').innerHTML=ids.map(function(i){var p=DATA.products[i];return '<div class="v39-item" onclick="openSheet('+i+')"><img src="'+p.img+'" loading="lazy" alt=""><div>'+p.name+'</div></div>'}).join('')}
+function smartSearch(){var input=document.getElementById('search-input');if(!input)return;var base=window.onSearch;input.addEventListener('input',function(){var q=norm(input.value);if(!q)return;var terms=[q];Object.keys(synonymMap).forEach(function(k){if(q.includes(norm(k)))terms=terms.concat(synonymMap[k])});if(terms.length>1){window.query=terms.join(' ');if(typeof window.renderGrid==='function')window.renderGrid();}else if(typeof base==='function'){/* native handler already runs */}})}
+function installBar(){var anchor=document.getElementById('chip-scroll');if(!anchor||document.getElementById('v39-smartbar'))return;var bar=document.createElement('div');bar.id='v39-smartbar';bar.innerHTML='<div class="v39-title">Descubre más rápido</div><div id="v39-filters"><button class="v39-pill active" data-v39="all">✨ Recomendados</button><button class="v39-pill" data-v39="best">🔥 Más vendidos</button><button class="v39-pill" data-v39="new">🆕 Novedades</button><button class="v39-pill" data-v39="equip">🛠️ Equipos</button><button class="v39-pill" data-v39="available">🟢 Disponibles</button></div>';anchor.parentNode.insertBefore(bar,anchor);bar.addEventListener('click',function(e){var b=e.target.closest('.v39-pill');if(!b)return;bar.querySelectorAll('.v39-pill').forEach(function(x){x.classList.remove('active')});b.classList.add('active');var mode=b.dataset.v39;if(mode==='all'){if(typeof clearFilters==='function')clearFilters()}else if(mode==='best'&&typeof showNewProducts==='function'){showNewProducts()}else if(mode==='new'&&typeof showNewProducts==='function'){showNewProducts()}else if(mode==='equip'&&typeof selectCat==='function'){selectCat('Equipos y Lámparas')}else if(mode==='available'){window.activeCat='Todos';var old=window.renderGrid;if(typeof old==='function'){old();var cards=document.querySelectorAll('#grid .card');cards.forEach(function(c){var t=(c.textContent||'').toLowerCase();if(t.includes('agotado'))c.style.display='none'})}}})}
+function wrapOpen(){var tries=0;var timer=setInterval(function(){tries++;if(typeof window.openSheet==='function'&&!window.__v39OpenWrapped){var base=window.openSheet;window.openSheet=function(idx){var a=recent().filter(function(x){return x!==idx});a.unshift(idx);saveRecent(a);renderRecent();return base.apply(this,arguments)};window.__v39OpenWrapped=true;clearInterval(timer)}if(tries>30)clearInterval(timer)},100)}
+function init(){installBar();wrapOpen();smartSearch();renderRecent();var r=document.createElement('section');r.id='v39-recent';r.innerHTML='<div class="v39-head"><strong>👀 Vistos recientemente</strong><button class="v39-clear" type="button">Limpiar</button></div><div class="v39-row"></div>';var grid=document.getElementById('grid');if(grid&&grid.parentNode){grid.parentNode.insertBefore(r,grid.nextSibling)}r.querySelector('.v39-clear').onclick=function(){saveRecent([]);renderRecent()};renderRecent();}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
+
 <script id="v39-update-notice">
 (function(){
   // Cambia este valor cada vez que actualices el catálogo para que el aviso vuelva a aparecer
@@ -2832,5 +2868,119 @@ window.shareCatalog911 = function(){
   }catch(e){}
 })();
 </script>
+
+<!-- INICIO V39.4 · COMBOS INTELIGENTES Y AUMENTO DE VALOR -->
+<style id="v394-style">
+.v394-wrap{margin:22px 0 34px;padding:20px;border:1px solid rgba(141,59,104,.14);border-radius:24px;background:linear-gradient(135deg,#fff,#fff7fa);box-shadow:0 12px 35px rgba(50,25,39,.06)}
+.v394-head{text-align:center}.v394-kicker{font-size:.72rem;font-weight:900;letter-spacing:.13em;color:#8d3b68;text-transform:uppercase}.v394-head h3{margin:7px 0;font-size:1.28rem}.v394-head p{margin:0;color:#70666d;font-size:.88rem;line-height:1.5}
+.v394-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}.v394-choice{border:1px solid #eadfe5;background:#fff;border-radius:18px;padding:14px;text-align:left;cursor:pointer;font:inherit;color:#423941;transition:.2s}.v394-choice:hover,.v394-choice.active{transform:translateY(-2px);border-color:#8d3b68;box-shadow:0 8px 22px rgba(141,59,104,.12)}.v394-choice strong{display:block;color:#8d3b68;font-size:.9rem}.v394-choice span{display:block;font-size:.76rem;color:#746a72;margin-top:4px;line-height:1.35}
+.v394-result{display:none;margin-top:16px;padding:16px;border-radius:18px;background:#241c22;color:#fff}.v394-result.show{display:block}.v394-result small{opacity:.72}.v394-result h4{margin:6px 0;font-size:1.1rem}.v394-result p{margin:0 0 12px;font-size:.84rem;line-height:1.45;color:#f4edf1}.v394-actions{display:flex;gap:9px;flex-wrap:wrap}.v394-btn{border:0;border-radius:999px;padding:10px 14px;font-weight:850;cursor:pointer;background:#fff;color:#8d3b68}.v394-btn.primary{background:#d94888;color:#fff}.v394-note{margin-top:11px;text-align:center;font-size:.73rem;color:#82777f}
+.v394-badge{display:inline-flex;align-items:center;gap:5px;margin-left:6px;font-size:.62rem;padding:4px 7px;border-radius:999px;background:#f7eaf1;color:#8d3b68;font-weight:900;vertical-align:middle}
+@media(max-width:560px){.v394-steps{grid-template-columns:1fr}.v394-wrap{padding:16px}}
+</style>
+<script id="v394-script">
+(function(){
+  const combos={
+    inicio:{name:'Combo Inicio Profesional',reason:'Ideal para construir una base de materiales para comenzar tu práctica profesional.',course:'Anatomía de la Uña Natural',level:'Principiante'},
+    intermedio:{name:'Combo Nail Art',reason:'Pensado para ampliar tus recursos creativos y elevar el nivel de tus diseños.',course:'Colorimetría',level:'Intermedio'},
+    negocio:{name:'Combo Emprendedora',reason:'Una propuesta más completa para quienes desean fortalecer su servicio y emprendimiento.',course:'Ergonomía y Organización del Puesto',level:'Avanzado'}
+  };
+  function init(){
+    const target=document.querySelector('#combos-911-v11 .v11-combos-inner');
+    if(!target||document.getElementById('v394-recommender')) return;
+    const box=document.createElement('section');box.id='v394-recommender';box.className='v394-wrap';
+    box.innerHTML=`<div class="v394-head"><div class="v394-kicker">Recomendación personalizada</div><h3>✨ Encuentra tu Combo 911 Nails</h3><p>Selecciona tu objetivo y te orientamos hacia el combo que mejor encaja con tu siguiente paso.</p></div><div class="v394-steps"><button class="v394-choice" data-key="inicio"><strong>🌱 Estoy comenzando</strong><span>Quiero reunir lo esencial para iniciar mi práctica.</span></button><button class="v394-choice" data-key="intermedio"><strong>🎨 Quiero especializarme</strong><span>Busco ampliar técnicas, creatividad y recursos.</span></button><button class="v394-choice" data-key="negocio"><strong>🚀 Quiero emprender</strong><span>Necesito una propuesta más completa para crecer.</span></button></div><div class="v394-result" aria-live="polite"><small>RECOMENDACIÓN 911 NAILS</small><h4></h4><p></p><div class="v394-actions"><button class="v394-btn primary" data-action="view">Ver mi combo recomendado</button><button class="v394-btn" data-action="course">Ver formación relacionada</button></div></div><div class="v394-note">💡 La recomendación es orientativa. Puedes explorar todos los combos y solicitar asesoría personalizada.</div>`;
+    target.insertBefore(box,target.querySelector('.v11-combo-grid'));
+    let current=null;
+    box.querySelectorAll('.v394-choice').forEach(btn=>btn.addEventListener('click',()=>{
+      current=btn.dataset.key; const c=combos[current];
+      box.querySelectorAll('.v394-choice').forEach(x=>x.classList.toggle('active',x===btn));
+      const r=box.querySelector('.v394-result');r.querySelector('h4').textContent=c.name+' — '+c.level;r.querySelector('p').textContent=c.reason;r.classList.add('show');
+      try{localStorage.setItem('911_combo_recommendation',current)}catch(e){}
+    }));
+    box.querySelector('[data-action="view"]').addEventListener('click',()=>{
+      if(!current)return;const name=combos[current].name;const cards=[...document.querySelectorAll('#v13-combo-grid .v11-combo')];const card=cards.find(x=>x.querySelector('h3')?.textContent.trim()===name);if(card){card.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{card.querySelector('button')?.click()},350)}
+    });
+    box.querySelector('[data-action="course"]').addEventListener('click',()=>{
+      if(!current)return;const q=combos[current].course;const courses=[...document.querySelectorAll('button,a,[role="button"]')];const el=courses.find(x=>x.textContent&&x.textContent.trim().includes(q));if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.click?.()}else{alert('Formación relacionada: '+q)}
+    });
+    try{const saved=localStorage.getItem('911_combo_recommendation');if(saved&&combos[saved]) box.querySelector('[data-key="'+saved+'"]').click()}catch(e){}
+    // Etiqueta visual de recomendación en combos estratégicos sin alterar precios ni contenido.
+    document.querySelectorAll('#v13-combo-grid .v11-combo h3').forEach(h=>{if(['Combo Inicio Profesional','Combo Emprendedora'].includes(h.textContent.trim())&&!h.querySelector('.v394-badge')){const b=document.createElement('span');b.className='v394-badge';b.textContent=h.textContent.trim()==='Combo Inicio Profesional'?'IDEAL PARA EMPEZAR':'PARA CRECER';h.appendChild(b)}});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,300));else setTimeout(init,300);
+  document.documentElement.setAttribute('data-911-v394','ready');
+})();
+</script>
+<!-- FIN V39.4 -->
+
+
+<!-- V39.5 PATCH: Confianza y Fidelización -->
+<style id="v395-loyalty-style">
+.v395-panel{margin:18px 12px;padding:18px;border-radius:22px;background:linear-gradient(135deg,#171217,#2a1725);color:#fff;box-shadow:0 10px 28px rgba(0,0,0,.16)}
+.v395-title{font-size:1.05rem;font-weight:800;margin:0 0 6px}.v395-sub{font-size:.88rem;opacity:.85;margin:0 0 14px}.v395-actions{display:flex;gap:8px;overflow:auto;padding-bottom:2px}.v395-btn{border:0;border-radius:999px;padding:10px 14px;white-space:nowrap;font-weight:700;background:#fff;color:#21131d;cursor:pointer}.v395-btn.primary{background:#e73f8d;color:#fff}.v395-favs{margin:16px 12px;padding:16px;border-radius:18px;background:#fff;box-shadow:0 5px 18px rgba(0,0,0,.08)}.v395-favs h3{margin:0 0 6px}.v395-list{display:flex;gap:10px;overflow:auto}.v395-chip{min-width:130px;padding:10px;border-radius:14px;background:#f7f4f6;font-size:.82rem}.v395-toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%) translateY(20px);opacity:0;z-index:99999;background:#191319;color:#fff;padding:12px 16px;border-radius:999px;transition:.25s;box-shadow:0 8px 24px rgba(0,0,0,.25)}.v395-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.v395-card-tools{display:flex;gap:6px;margin-top:8px}.v395-mini{border:0;border-radius:10px;padding:7px 9px;background:#f1e8ed;cursor:pointer;font-size:.78rem}.v395-mini.fav{background:#ffe3ef;color:#b01861}
+</style>
+<script id="v395-loyalty-script">
+(()=>{const KEY='911_v395_favorites',CART='911_v395_cart_reminder';
+const get=()=>JSON.parse(localStorage.getItem(KEY)||'[]'); const set=a=>localStorage.setItem(KEY,JSON.stringify(a));
+function toast(t){let x=document.querySelector('.v395-toast');if(!x){x=document.createElement('div');x.className='v395-toast';document.body.appendChild(x)}x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),2200)}
+function productName(el){let n=el.querySelector('h1,h2,h3,h4,.name,.product-name,.title');return (n&&n.textContent.trim())||el.getAttribute('data-name')||'Producto 911 Nails'}
+function cards(){return [...document.querySelectorAll('[data-product],.product-card,.product,.card')].filter(e=>productName(e).length>2)}
+function renderFavs(){let box=document.getElementById('v395-favorites');if(!box)return;let a=get();box.innerHTML='<h3>❤️ Mis favoritos</h3><p style="margin:0 0 12px;font-size:.85rem;color:#666">'+(a.length?'Productos guardados para volver a verlos cuando quieras.':'Aún no has guardado productos.')+'</p><div class="v395-list">'+a.slice(-8).reverse().map(n=>'<div class="v395-chip">'+n.replace(/</g,'&lt;')+'</div>').join('')+'</div>'}
+function injectButtons(){cards().forEach(c=>{if(c.dataset.v395)return;c.dataset.v395='1';let n=productName(c),tools=document.createElement('div');tools.className='v395-card-tools';tools.innerHTML='<button class="v395-mini fav">♡ Favorito</button><button class="v395-mini share">↗ Compartir</button><button class="v395-mini ask">💬 Asesoría</button>';tools.querySelector('.fav').onclick=e=>{e.stopPropagation();let a=get(),i=a.indexOf(n);if(i>=0){a.splice(i,1);toast('Eliminado de favoritos')}else{a.push(n);toast('Guardado en favoritos ❤️')}set(a);renderFavs()};tools.querySelector('.share').onclick=e=>{e.stopPropagation();let msg='Hola, mira este producto de 911 Nails: '+n;if(navigator.share)navigator.share({title:n,text:msg,url:location.href}).catch(()=>{});else window.open('https://wa.me/?text='+encodeURIComponent(msg+' '+location.href),'_blank')};tools.querySelector('.ask').onclick=e=>{e.stopPropagation();window.open('https://wa.me/573018442704?text='+encodeURIComponent('Hola 911 Nails, quiero asesoría sobre: '+n),'_blank')};c.appendChild(tools)})}
+function addPanel(){if(document.getElementById('v395-panel'))return;let host=document.querySelector('main')||document.body;let p=document.createElement('section');p.id='v395-panel';p.className='v395-panel';p.innerHTML='<h2 class="v395-title">✨ Tu experiencia 911 Nails</h2><p class="v395-sub">Guarda tus favoritos, comparte productos y recibe asesoría personalizada.</p><div class="v395-actions"><button class="v395-btn primary" id="v395-showfav">❤️ Ver favoritos</button><button class="v395-btn" id="v395-sharecat">📲 Compartir catálogo</button><button class="v395-btn" id="v395-help">💬 Necesito asesoría</button></div>';host.insertBefore(p,host.firstChild);let f=document.createElement('section');f.id='v395-favorites';f.className='v395-favs';p.after(f);p.querySelector('#v395-showfav').onclick=()=>document.getElementById('v395-favorites').scrollIntoView({behavior:'smooth'});p.querySelector('#v395-sharecat').onclick=()=>{let t='Descubre el catálogo profesional de 911 Nails ✨';if(navigator.share)navigator.share({title:'911 Nails',text:t,url:location.href}).catch(()=>{});else window.open('https://wa.me/?text='+encodeURIComponent(t+' '+location.href),'_blank')};p.querySelector('#v395-help').onclick=()=>window.open('https://wa.me/573018442704?text='+encodeURIComponent('Hola 911 Nails, necesito asesoría personalizada para elegir productos.'),'_blank');renderFavs()}
+function cartReminder(){document.addEventListener('click',e=>{let t=(e.target.textContent||'').toLowerCase();if(/agregar|añadir/.test(t)){localStorage.setItem(CART,Date.now().toString())}},true);let ts=+localStorage.getItem(CART)||0;if(ts&&Date.now()-ts>3600000&&Date.now()-ts<172800000)setTimeout(()=>toast('🛒 ¿Aún estás pensando en tu pedido? Tus productos pueden seguir esperándote.'),2500)}
+function init(){addPanel();injectButtons();cartReminder();new MutationObserver(()=>injectButtons()).observe(document.body,{childList:true,subtree:true})}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(init,900));else setTimeout(init,900);document.documentElement.setAttribute('data-911-v395','ready')})();
+</script>
+<!-- FIN V39.5 -->
+
 </body>
-</html>
+</html><!-- V39.2 · SEGUNDA CAPA DE CONVERSIÓN: venta cruzada + productos relacionados + Academia -->
+<style id="v39-conversion-ui">
+.v39-conversion{margin:18px 14px;padding:16px;border:1px solid #eadce4;border-radius:22px;background:linear-gradient(145deg,#fff,#fcf7fa);box-shadow:0 8px 24px rgba(70,40,60,.06)}
+.v39-conversion h3{margin:0 0 5px;font-size:16px;color:#35242d}.v39-conversion p{margin:0 0 12px;color:#76636d;font-size:12px;line-height:1.45}.v39-rec-row{display:flex;gap:10px;overflow:auto;padding:2px 1px 8px}.v39-rec-card{min-width:145px;max-width:145px;border:1px solid #eee2e9;border-radius:16px;padding:10px;background:#fff}.v39-rec-card img{width:100%;height:88px;object-fit:contain;border-radius:10px}.v39-rec-name{font-size:11px;font-weight:800;margin:7px 0 4px;line-height:1.25}.v39-rec-price{font-size:12px;color:#8d3b68;font-weight:900}.v39-rec-add{width:100%;margin-top:7px;border:0;border-radius:10px;padding:8px;background:#8d3b68;color:#fff;font-weight:800;font-size:11px}.v39-course-link{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;padding:12px;border-radius:15px;background:#f8eef3;border:1px dashed #cda5b9;color:#5b3346}.v39-course-link button{border:0;border-radius:10px;padding:8px 10px;background:#fff;color:#8d3b68;font-weight:800;font-size:11px}.v39-cart-rec{margin-top:12px;padding-top:12px;border-top:1px solid #eee2e9}.v39-toast{position:fixed;left:50%;bottom:145px;transform:translateX(-50%) translateY(20px);opacity:0;z-index:10020;background:#2f2430;color:#fff;padding:11px 16px;border-radius:999px;font:700 12px Arial;transition:.25s;pointer-events:none}.v39-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+<script id="v39-conversion-layer">
+(function(){
+  const courseMap=[
+    {keys:['acrílico','monómero','kolinsky'],course:'Sistema Acrílico'},
+    {keys:['gel','base coat','top coat','rubber'],course:'Sistema de Gel'},
+    {keys:['drill','broca','e-file'],course:'E-File Profesional'},
+    {keys:['lima','cutícula','empujador','tijera'],course:'Manicura Rusa'},
+    {keys:['esmalte','color','ojo de gato'],course:'Colorimetría'}
+  ];
+  function toast(t){let x=document.getElementById('v39-conv-toast');if(!x){x=document.createElement('div');x.id='v39-conv-toast';x.className='v39-toast';document.body.appendChild(x)}x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1800)}
+  function related(idx,limit){const p=DATA.products[idx];if(!p)return[];const words=(p.name+' '+p.cat+' '+(p.brand||'')).toLowerCase().split(/\s+/).filter(w=>w.length>3);return DATA.products.map((x,i)=>({x,i,score:(x.cat===p.cat?5:0)+words.reduce((s,w)=>s+((x.name+' '+x.meta+' '+x.desc).toLowerCase().includes(w)?1:0),0)})).filter(a=>a.i!==idx&&a.x.stock!==0&&a.score>0).sort((a,b)=>b.score-a.score).slice(0,limit||4)}
+  function recHTML(items){return items.map(({x,i})=>`<div class="v39-rec-card"><img src="${x.img}" alt="${x.name}"><div class="v39-rec-name">${x.name}</div><div class="v39-rec-price">${typeof displayPrice==='function'?displayPrice(x):''}</div><button class="v39-rec-add" onclick="addToOrder(${i});v39ConversionToast('✓ Agregado a tu pedido')">+ Agregar</button></div>`).join('')}
+  window.v39ConversionToast=toast;
+  function courseFor(p){const s=(p.name+' '+p.cat+' '+p.meta).toLowerCase();const m=courseMap.find(m=>m.keys.some(k=>s.includes(k)));return m&&m.course}
+  function enhanceSheet(){const sheet=document.querySelector('.sheet.open,.product-sheet.open,#sheet.open,[data-sheet].open');const active=window.activeProductIndex; if(!sheet||active==null||sheet.dataset.v39idx==active)return;sheet.dataset.v39idx=active;const p=DATA.products[active];const items=related(active,4);const course=courseFor(p);const box=document.createElement('div');box.className='v39-conversion';box.innerHTML=`<h3>✨ Completa tu experiencia</h3><p>Seleccionamos productos que combinan con <b>${p.name}</b>.</p><div class="v39-rec-row">${recHTML(items)}</div>${course?`<div class="v39-course-link"><span>🎓 ¿Quieres aprender a utilizar productos como este?<br><b>${course}</b></span><button onclick="if(typeof setTab==='function'){setTab('cursos');setTimeout(()=>{const q=document.querySelector('[data-course-name*=\'${course}\']');if(q)q.scrollIntoView({behavior:'smooth'})},250)}">Ver Academia →</button></div>`:''}`;sheet.appendChild(box)}
+  const obs=new MutationObserver(enhanceSheet);obs.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+  const originalAdd=window.addToOrder; if(originalAdd){window.addToOrder=function(idx,evt){const r=originalAdd.apply(this,arguments);setTimeout(()=>toast('🛒 Producto agregado · mira cómo completar tu compra'),80);return r}}
+  const originalRender=window.renderOrder; if(originalRender){window.renderOrder=function(){const r=originalRender.apply(this,arguments);setTimeout(enhanceCart,0);return r}}
+  function enhanceCart(){const summary=document.getElementById('order-summary');if(!summary||!Object.keys(orderList||{}).length)return;if(document.getElementById('v39-cart-rec'))return;const ids=Object.keys(orderList).map(Number);let pool=[];ids.forEach(id=>pool=pool.concat(related(id,3)));const seen=new Set(ids), picks=[];pool.forEach(x=>{if(!seen.has(x.i)&&!picks.some(y=>y.i===x.i)&&picks.length<3)picks.push(x)});if(!picks.length)return;const d=document.createElement('div');d.id='v39-cart-rec';d.className='v39-cart-rec';d.innerHTML=`<h3 style="font-size:14px;margin:0 0 5px">💡 Completa tu compra</h3><p style="font-size:12px;margin:0 0 10px;color:#76636d">Productos complementarios seleccionados para tu pedido.</p><div class="v39-rec-row">${recHTML(picks)}</div>`;summary.appendChild(d)}
+  setTimeout(enhanceCart,800);
+})();
+</script>
+<!-- FIN V39.2 -->
+<!-- V39.3 · TERCERA CAPA: CHECKOUT / PEDIDO INTELIGENTE -->
+<style id="v393-checkout-ui">
+.v393-checkout{margin-top:12px;padding:14px;border:1px solid #eadce4;border-radius:18px;background:#fcf8fa}.v393-checkout h3{margin:0 0 4px;font-size:15px;color:#3e2b35}.v393-checkout p{margin:0 0 12px;font-size:11px;line-height:1.45;color:#76636d}.v393-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.v393-option{position:relative}.v393-option input{position:absolute;opacity:0}.v393-option label{display:block;border:1px solid #e7d9e1;border-radius:13px;padding:10px 8px;background:#fff;font-size:11px;font-weight:800;color:#594651;text-align:center;cursor:pointer;min-height:42px}.v393-option input:checked+label{border-color:#8d3b68;background:#f8edf3;color:#8d3b68;box-shadow:0 0 0 2px rgba(141,59,104,.08)}.v393-field{margin-top:10px}.v393-field label{display:block;font-size:11px;font-weight:800;margin-bottom:5px;color:#594651}.v393-field input,.v393-field textarea{width:100%;box-sizing:border-box;border:1px solid #e7d9e1;border-radius:11px;padding:10px;font:12px Arial;background:#fff}.v393-field textarea{min-height:54px;resize:vertical}.v393-total{margin-top:12px;padding:11px;border-radius:12px;background:#f5edf1;display:flex;justify-content:space-between;align-items:center;font-size:12px}.v393-total strong{font-size:15px;color:#8d3b68}.v393-note{margin-top:8px;font-size:10px;color:#85747d}.v393-progress{display:flex;gap:5px;margin:8px 0 12px}.v393-progress span{height:5px;flex:1;border-radius:99px;background:#eadde4}.v393-progress span.on{background:#8d3b68}
+@media(max-width:380px){.v393-grid{grid-template-columns:1fr}}
+</style>
+<script id="v393-checkout-layer">
+(function(){
+  const KEY='911nails_checkout_v393';
+  function money(){try{let total=0;let ok=true;Object.entries(orderList||{}).forEach(([i,q])=>{let p=DATA.products[+i],raw=p&&extractPrice(p);let n=Number(String(raw||'').replace(/[^0-9]/g,''));if(!n)ok=false;else total+=n*(+q||0)});return ok?'$'+total.toLocaleString('es-CO'):'Por confirmar'}catch(e){return 'Por confirmar'}}
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}}
+  function save(){const root=document.getElementById('v393-checkout');if(!root)return;const v={name:root.querySelector('[name=name]').value,phone:root.querySelector('[name=phone]').value,delivery:root.querySelector('[name=delivery]:checked')?.value||'',payment:root.querySelector('[name=payment]:checked')?.value||'',note:root.querySelector('[name=note]').value};localStorage.setItem(KEY,JSON.stringify(v))}
+  function block(){const old=document.getElementById('v393-checkout');if(old)old.remove();if(!orderCount())return;const d=load();const el=document.createElement('div');el.id='v393-checkout';el.className='v393-checkout';el.innerHTML=`<h3>🧾 Finaliza tu pedido</h3><p>Completa estos datos para que tu solicitud llegue más clara y organizada por WhatsApp.</p><div class="v393-progress"><span class="on"></span><span class="on"></span><span class="on"></span></div><div class="v393-field"><label>Nombre (opcional)</label><input name="name" placeholder="Tu nombre" value="${d.name||''}"></div><div class="v393-field"><label>Teléfono (opcional)</label><input name="phone" inputmode="tel" placeholder="Tu número de contacto" value="${d.phone||''}"></div><div class="v393-field"><label>🚚 Tipo de entrega</label><div class="v393-grid"><div class="v393-option"><input id="v393-del1" type="radio" name="delivery" value="Recoger" ${d.delivery==='Recoger'?'checked':''}><label for="v393-del1">🏪 Recoger</label></div><div class="v393-option"><input id="v393-del2" type="radio" name="delivery" value="Domicilio" ${d.delivery==='Domicilio'?'checked':''}><label for="v393-del2">🛵 Domicilio</label></div><div class="v393-option"><input id="v393-del3" type="radio" name="delivery" value="Envío nacional" ${d.delivery==='Envío nacional'?'checked':''}><label for="v393-del3">📦 Envío nacional</label></div></div></div><div class="v393-field"><label>💳 Método de pago preferido</label><div class="v393-grid"><div class="v393-option"><input id="v393-pay1" type="radio" name="payment" value="Transferencia" ${d.payment==='Transferencia'?'checked':''}><label for="v393-pay1">Transferencia</label></div><div class="v393-option"><input id="v393-pay2" type="radio" name="payment" value="Nequi / Daviplata" ${d.payment==='Nequi / Daviplata'?'checked':''}><label for="v393-pay2">Nequi / Daviplata</label></div><div class="v393-option"><input id="v393-pay3" type="radio" name="payment" value="Por confirmar" ${d.payment==='Por confirmar'?'checked':''}><label for="v393-pay3">Por confirmar</label></div></div></div><div class="v393-field"><label>Nota para el pedido (opcional)</label><textarea name="note" placeholder="Ej.: Necesito asesoría para elegir los productos.">${d.note||''}</textarea></div><div class="v393-total"><span>Valor estimado del pedido</span><strong>${money()}</strong></div><div class="v393-note">El valor final y la disponibilidad serán confirmados por 911 Nails.</div>`;
+    const summary=document.getElementById('order-summary'); if(summary)summary.appendChild(el); el.addEventListener('change',save);el.addEventListener('input',save);
+  }
+  const baseRender=window.renderOrder; if(baseRender)window.renderOrder=function(){const r=baseRender.apply(this,arguments);setTimeout(block,30);return r};
+  const baseWA=window.sendOrderWhatsApp;window.sendOrderWhatsApp=function(){if(!orderCount())return;save();const d=load();let msg=typeof orderMessage==='function'?orderMessage():'Hola 911 Nails, quiero hacer este pedido.';const extra=[];if(d.name)extra.push('👤 Nombre: '+d.name);if(d.phone)extra.push('📱 Teléfono: '+d.phone);if(d.delivery)extra.push('🚚 Entrega: '+d.delivery);if(d.payment)extra.push('💳 Pago preferido: '+d.payment);if(d.note)extra.push('📝 Nota: '+d.note);msg+='\n\n━━━ DATOS DEL PEDIDO ━━━\n'+(extra.length?extra.join('\n'):'Sin información adicional')+'\n\n🧾 Valor estimado: '+money()+'\n\nQuedo atento(a) a la confirmación de disponibilidad y valor final.';window.open('https://wa.me/573018442704?text='+encodeURIComponent(msg),'_blank')};
+  setTimeout(block,700);document.documentElement.setAttribute('data-911-v393','ready');
+})();
+</script>
+<!-- FIN V39.3 -->
