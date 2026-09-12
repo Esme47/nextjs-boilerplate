@@ -2,7 +2,14 @@ import { readFile } from "fs/promises";
 import path from "path";
 import { NextResponse } from "next/server";
 
-export const dynamic = "force-static";
+// IMPORTANTE: force-dynamic (no force-static). Con force-static, Next.js
+// "hornea" el HTML una sola vez y en despliegues siguientes reutiliza esa
+// version cacheada del build anterior, aunque el archivo .html haya
+// cambiado en el repositorio (por eso el catalogo se quedaba pegado en
+// una version vieja). Con force-dynamic, el archivo se lee de nuevo en
+// cada solicitud, garantizando que siempre se sirva el contenido actual.
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const catalogFile = path.join(
   process.cwd(),
