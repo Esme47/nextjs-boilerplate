@@ -14,7 +14,7 @@ export const revalidate = 0;
 const catalogFile = path.join(
   process.cwd(),
   "app",
-  "911_Nails_Catalogo_V39_5_Confianza_Fidelizacion.html",
+  "911_Nails_Catalogo_V39_5_Confianza_Fidelizacion-2.html",
 );
 
 export async function GET() {
