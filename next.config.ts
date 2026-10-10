@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   // .html dentro del paquete de la funcion dinamica, causando un error/404
   // al recibir una visita real aunque el build compile bien.
   outputFileTracingIncludes: {
-    "/catalogo": ["./app/911_Nails_Catalogo_V39_5_Confianza_Fidelizacion.html"],
+    "/catalogo": ["./app/911_Nails_Catalogo_V39_5_Confianza_Fidelizacion-2.html"],
   },
 };
 
